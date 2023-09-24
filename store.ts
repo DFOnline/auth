@@ -44,3 +44,11 @@ export function setUser(uuid: string, username: string, key: string) {
     hasher.update(key);
     db.query(`INSERT INTO users (id, username, token) VALUES (?, ?, ?);`).run(uuid,username,hasher.digest('base64'));
 }
+/**
+ * Gets user data.
+ * @param user UUID, username or (hashed) key.
+ */
+export function getUser(user : string) : {uuid: string, username: string, key: string} {
+    throw new Error("Unimpleneted")
+    // TODO: this
+}

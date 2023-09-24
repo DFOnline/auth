@@ -17,7 +17,7 @@ function isValidPlot(req: {'headers': Store, 'query': Store}) {
 
 new Elysia()
     .get('/', () => `Hello World!`)
-    .put('/add', async (req) => {
+    .put('/user', async (req) => {
         if(!isValidPlot(req)) {
             req.set.status = "Forbidden";
             // log the requesters ip 🤨📸
@@ -27,5 +27,8 @@ new Elysia()
         const {uuid, username, key} = req.body as any; // we will error, and we will cope, and we will seethe, and we will cope, and we will seethe
         setUser(uuid, username, key)
         return; // Only DF is supposed to be here, and it doesn't use response bodies.
+    })
+    .delete('/user', async (req) => {
+        
     })
     .listen(3000)
