@@ -1,10 +1,10 @@
 import { env, file } from "bun";
-import Elysia from "elysia";
-import { authUser, deleteUser, setUser } from "./store";
+import Elysia, { Cookie } from "elysia";
+import { User, authUser, deleteUser, setUser } from "./store";
 
 
 type Store = Record<string, string | null>;
-function isValidPlot(req: {'headers': Store, 'query': Store}) {
+function isValidPlot(req: {headers: Store, query: Store}) {
     if(req.query['auth'] != env.AUTH_KEY) return false;
     const match = (req.headers['user-agent']?.match(/DiamondFire\/(?<version>\d(?:\.\d)+) \((?<plotid>\d+), (?<plotowner>\w{3,16})\)/));
     if(match == null) return false;
@@ -13,6 +13,11 @@ function isValidPlot(req: {'headers': Store, 'query': Store}) {
     
     if(plotowner != env.PLOT_OWNER) return false;
     return true;
+}
+
+function authReqUser(req: {body: any, cookie: Record<string, Cookie<any>>, headers: Store, query: Store}): User | null {
+    const key = req.query['auth'] ?? req.query['key'] ?? req.cookie['key'].value ?? req.headers['Authorization'] ?? req.body;
+    return authUser(key);
 }
 
 new Elysia()
@@ -45,10 +50,10 @@ new Elysia()
             req.set.status = "No Content";
             return;
         }
-        const auth = authUser(req.query['auth'] as any) ?? authUser(req.body as any);
+        const auth = authReqUser(req);
         if(auth == null) {
             req.set.status = "Unauthorized";
-            return "401 Unauthorized.\nA user can delete themselves by\nputting the token in a search query: ?auth=<token>\nOR put it as the body.";
+            return "401 Unauthorized.";
         }
         deleteUser(auth.uuid);
         return {"status":"deleted",...auth};
@@ -56,10 +61,10 @@ new Elysia()
     .get('/user', (req) => {
         req.set.headers['Access-Control-Allow-Origin'] = '*';
         // the plot will never get info, so it doesn't have access.
-        const auth = authUser(req.query['auth'] as any);
+        const auth = authReqUser(req);
         if(auth == null) {
             req.set.status = "Unauthorized";
-            return "401 Unauthorized.\nPut the token in a search query: ?auth=<token>\nOR put it as the body.";
+            return "401 Unauthorized.";
         }
         return auth;
     })
