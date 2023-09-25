@@ -66,8 +66,12 @@
     const loggedIn = document.getElementById('logged-in');
 
     const key = new URLSearchParams(location.search).get('key');
+    /// hide key in url, don't do this if you want to allow bookmarks for login.
+    // const changeUrl = new URL(location.href);
+    // changeUrl.search = '';
+    // window.history.replaceState(null, document.title, changeUrl);
 
-    const url = `http://localhost:3000/user?auth=${key}`;
+    const url = `./user?auth=${key}`;
 
     async function load() {
         if(key == null) {
@@ -90,7 +94,7 @@
              * @type {HTMLImageElement}
              */
             const head = document.getElementById('head');
-            head.src = `https://crafatar.com/avatars/${auth.id}?overlay`;
+            head.src = `https://crafatar.com/avatars/${auth.uuid}?overlay`;
             document.getElementById('username').innerText = auth.username;
 
             loading.style.display = 'none';

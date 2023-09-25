@@ -2,16 +2,18 @@ import { env, file } from "bun";
 import Elysia, { Cookie } from "elysia";
 import { User, authUser, deleteUser, setUser } from "./store";
 
+const {PLOT_ID, PLOT_OWNER, AUTH_KEY} = env as Record<string,string>;
+
 
 type Store = Record<string, string | null>;
 function isValidPlot(req: {headers: Store, query: Store}) {
-    if(req.query['auth'] != env.AUTH_KEY) return false;
+    if(req.query['auth'] != AUTH_KEY) return false;
     const match = (req.headers['user-agent']?.match(/DiamondFire\/(?<version>\d(?:\.\d)+) \((?<plotid>\d+), (?<plotowner>\w{3,16})\)/));
     if(match == null) return false;
     const [matched, dfversion, plotid, plotowner] = match;
-    if(plotid != env.PLOT_ID) return false;
+    if(plotid != PLOT_ID) return false;
     
-    if(plotowner != env.PLOT_OWNER) return false;
+    if(plotowner != PLOT_OWNER) return false;
     return true;
 }
 

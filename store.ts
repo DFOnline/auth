@@ -51,6 +51,7 @@ export interface User {
  * @param key Non-Hashed pure access key.
  */
 export function setUser(uuid: string, username: string, key: string) {
+    deleteUser(uuid)
     db.query(`INSERT INTO users (uuid, username, token) VALUES (?1, ?2, ?3);`).run(uuid,username,hash(key));
 }
 /**
