@@ -25,4 +25,5 @@ body, html {
 
 .center {
     margin: auto;
+    text-align: center;
 }

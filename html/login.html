@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        #content {
+            margin-top: 1em;
+        }
+
+        #logged-in p {
+            margin: 0;
+        }
+
+        #logged-in * {
+            margin: auto;
+            max-height: 2em;
+            padding: 0.25em;
+        }
+    </style>
+</head>
+<body>
+    <div class="pane center">
+        <h1 class="center">Login</h1>
+        <div id="content">
+            <div id="loading">
+                Logging in...<br>
+                Please wait a moment.
+            </div>
+            <div id="no-key" style="display: none;">
+                You should only be here from the plot.
+            </div>
+            <div id="error" style="display: none;">
+                An error occurred.
+            </div>
+            <div id="logged-in" style="display: none;">
+                <img id="head" src="" alt="Player head"><span id="username">Username</span>
+        </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    const loading = document.getElementById('loading');
+    const noKey = document.getElementById('no-key');
+    const error = document.getElementById('error');
+    const loggedIn = document.getElementById('logged-in');
+
+    const key = new URLSearchParams(location.search).get('key');
+
+    const url = `http://localhost:3000/user?auth=${key}`;
+
+    async function load() {
+        if(key == null) {
+            loading.style.display = 'none';
+            noKey.style.display = 'block';
+            return;
+        }
+        const res = await fetch(url,{method: 'GET'});
+        if(res.status != 200) {
+            console.error(res);
+            loading.style.display = 'none';
+            error.style.display = 'block';
+            return;
+        }
+        try {
+            const auth = await res.json();
+            localStorage.setItem('user',JSON.stringify({...auth,key}));
+            console.log(localStorage.getItem('user'))
+
+            /**
+             * @type {HTMLImageElement}
+             */
+            const head = document.getElementById('head');
+            head.src = `https://crafatar.com/avatars/${auth.id}?overlay`;
+            document.getElementById('username').innerText = auth.username;
+
+            loading.style.display = 'none';
+            loggedIn.style.display = 'flex';
+        }
+        catch (e) {
+            console.error(e);
+            loading.style.display = 'none';
+            error.style.display = 'block';
+            return;
+        }
+    }
+
+    load();
+</script>
+</html>

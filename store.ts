@@ -35,7 +35,7 @@ db.run(`CREATE TABLE IF NOT EXISTS users (
 function hash(key: string) {
     const hasher = new Bun.CryptoHasher("sha256");
     hasher.update(key);
-    return hasher.digest('hex');
+    return hasher.digest('hex').toUpperCase();
 }
 
 export interface User {
@@ -51,7 +51,7 @@ export interface User {
  * @param key Non-Hashed pure access key.
  */
 export function setUser(uuid: string, username: string, key: string) {
-    db.query(`INSERT INTO users (id, username, token) VALUES (?, ?, ?);`).run(uuid,username,hash(key));
+    db.query(`INSERT INTO users (id, username, token) VALUES (?1, ?2, ?3);`).run(uuid,username,hash(key));
 }
 /**
  * Delete a user.

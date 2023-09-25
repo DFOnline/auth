@@ -44,6 +44,7 @@ new Elysia()
         return {"status":"deleted",...auth};
     })
     .get('/user', (req) => {
+        req.set.headers['Access-Control-Allow-Origin'] = '*';
         // the plot will never get info, so it doesn't have access.
         const auth = authUser(req.query['auth'] as any);
         if(auth == null) {
