@@ -5,9 +5,9 @@ Super simple OAuth like authenication for any web app that needs to recognize a 
 - [x] Plot access endpoints
 - [x] Plot adding users
 - [ ] Get user by key
-- [ ] Delete user
-- [ ] Plot delete user
-- [ ] Regen key
+- [x] Delete user
+- [ ] Plot delete user (this needs to be done on the plot)
+- [ ] Re-gen key (this needs to be done on the plot)
 ### Page
 - [ ] Page to fill cookie or storage
 - [ ] Page to redirect with verify key
