@@ -1,0 +1,17 @@
+# Spacefile Docs: https://go.deta.dev/docs/spacefile/v0
+v: 0
+app_name: Auth
+micros:
+  - name: dfo-auth
+    src: .
+    engine: custom
+    commands:
+      - apt-get update
+      - apt-get -y install zip
+      - curl -L --fail --location --progress-bar --output out.zip https://github.com/oven-sh/bun/releases/download/bun-v1.0.0/bun-linux-x64.zip
+      - unzip -d ./ -o out.zip
+      - mv ./bun-linux-x64/bun ./
+      - rm -r ./bun-linux-x64
+      - chmod +x ./bun
+    run: ./bun index.ts
+    primary: true
