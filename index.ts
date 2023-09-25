@@ -1,4 +1,4 @@
-import { env } from "bun";
+import { env, file } from "bun";
 import Elysia from "elysia";
 import { authUser, deleteUser, setUser } from "./store";
 
@@ -16,7 +16,17 @@ function isValidPlot(req: {'headers': Store, 'query': Store}) {
 }
 
 new Elysia()
-    .get('/', () => `Hello World!`)
+    .get('/', () => file('./html/index.html'))
+    .get('/style.css', () => file('./html/style.css'))
+    .get('/login', req => {
+        const auth = authUser(req.query['key'] as string);
+        if(auth != null) {
+            req.cookie['key'].value = req.query['key'];
+            req.cookie['uuid'].value = auth.uuid;
+            req.cookie['username'].value = auth.username
+        }
+        return file('./html/login.html');
+    })
     .put('/user', (req) => {
         if(!isValidPlot(req)) {
             req.set.status = "Forbidden";

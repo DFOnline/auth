@@ -10,14 +10,24 @@
             margin-top: 1em;
         }
 
-        #logged-in p {
+        #logged-in div {
+            display: flex;
+        }
+
+        #logged-in div p {
             margin: 0;
         }
 
-        #logged-in * {
-            margin: auto;
+        #logged-in div * {
+            margin-block: auto;
             max-height: 2em;
             padding: 0.25em;
+        }
+        #logged-in div :first-child {
+            margin-left: auto;
+        }
+        #logged-in div :last-child {
+            margin-right: auto;
         }
     </style>
 </head>
@@ -36,7 +46,14 @@
                 An error occurred.
             </div>
             <div id="logged-in" style="display: none;">
-                <img id="head" src="" alt="Player head"><span id="username">Username</span>
+                <div>
+                    <img id="head" src="" alt="Player head"><span id="username">Username</span>
+                </div>
+                <p>
+                    All done!
+                    <br>
+                    You are logged in, you can close this tab.
+                </p>
         </div>
         </div>
     </div>
@@ -68,7 +85,6 @@
         try {
             const auth = await res.json();
             localStorage.setItem('user',JSON.stringify({...auth,key}));
-            console.log(localStorage.getItem('user'))
 
             /**
              * @type {HTMLImageElement}
@@ -78,7 +94,7 @@
             document.getElementById('username').innerText = auth.username;
 
             loading.style.display = 'none';
-            loggedIn.style.display = 'flex';
+            loggedIn.style.display = 'block';
         }
         catch (e) {
             console.error(e);

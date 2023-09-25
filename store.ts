@@ -27,7 +27,7 @@ async function save() {
 
 const db = await load();
 db.run(`CREATE TABLE IF NOT EXISTS users (
-    id UUID PRIMARY KEY,
+    uuid UUID PRIMARY KEY,
     username VARCHAR(16),
     token TEXT
 );`)
@@ -51,21 +51,21 @@ export interface User {
  * @param key Non-Hashed pure access key.
  */
 export function setUser(uuid: string, username: string, key: string) {
-    db.query(`INSERT INTO users (id, username, token) VALUES (?1, ?2, ?3);`).run(uuid,username,hash(key));
+    db.query(`INSERT INTO users (uuid, username, token) VALUES (?1, ?2, ?3);`).run(uuid,username,hash(key));
 }
 /**
  * Delete a user.
- * @param user Any user value, such as id, name, hashed token.
+ * @param user Any user value, such as uuid, name, hashed token.
  */
 export function deleteUser(user : string) {
-    db.query(`DELETE FROM users WHERE id = ?1 OR username = ?1 OR token = ?1`).run(user);
+    db.query(`DELETE FROM users WHERE uuid = ?1 OR username = ?1 OR token = ?1`).run(user);
 }
 /**
  * Gets user data.
- * @param user Any user value, such as id, name, token hashed or not.
+ * @param user Any user value, such as uuid, name, token hashed or not.
  */
 export function getUser(user : string) : User | null {
-    return db.query(`SELECT * FROM users WHERE id = ?1 OR username = ?1 OR token = ?1`).get(user) ?? authUser(user) as any;
+    return db.query(`SELECT * FROM users WHERE uuid = ?1 OR username = ?1 OR token = ?1`).get(user) ?? authUser(user) as any;
 }
 /**
  * Safely get a user which needs authorization.
