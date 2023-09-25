@@ -38,9 +38,20 @@ new Elysia()
         const auth = authUser(req.query['auth'] as any) ?? authUser(req.body as any);
         if(auth == null) {
             req.set.status = "Unauthorized";
-            return "401 Unauthorized. A user can delete themselves by putting the token as the plain body, or in a search query ?auth=<token>";
+            return "401 Unauthorized.\nA user can delete themselves by\nputting the token in a search query: ?auth=<token>\nOR put it as the body.";
         }
         deleteUser(auth.uuid);
         return {"status":"deleted",...auth};
     })
-    .listen(3000)
+    .get('/user', (req) => {
+        // the plot will never get info, so it doesn't have access.
+        const auth = authUser(req.query['auth'] as any) ?? authUser(req.body as any);
+        if(auth == null) {
+            req.set.status = "Unauthorized";
+            return "401 Unauthorized.\nPut the token in a search query: ?auth=<token>\nOR put it as the body.";
+        }
+        return auth;
+    })
+    .listen(3000, () => {
+        console.log('Listening.');
+    });

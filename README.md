@@ -1,10 +1,10 @@
 # auth
-Super simple OAuth like authenication for any web app that needs to recognize a player.
+Super simple OAuth like authentication for any web app that needs to recognize a player.
 
 ## Progress
 - [x] Plot access endpoints
 - [x] Plot adding users
-- [ ] Get user by key
+- [x] Get user by key
 - [x] Delete user
 - [ ] Plot delete user (this needs to be done on the plot)
 - [ ] Re-gen key (this needs to be done on the plot)
