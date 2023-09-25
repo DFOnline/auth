@@ -45,7 +45,7 @@ new Elysia()
     })
     .get('/user', (req) => {
         // the plot will never get info, so it doesn't have access.
-        const auth = authUser(req.query['auth'] as any) ?? authUser(req.body as any);
+        const auth = authUser(req.query['auth'] as any);
         if(auth == null) {
             req.set.status = "Unauthorized";
             return "401 Unauthorized.\nPut the token in a search query: ?auth=<token>\nOR put it as the body.";
