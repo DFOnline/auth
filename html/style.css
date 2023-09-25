@@ -8,10 +8,14 @@ body, html {
     min-width: 100vw;
     min-height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    flex-flow: column;
 }
 
-.pane {
+
+.bg,.pane {
     background-color: #333;
+}
+.pane {
     border-radius: 1em;
     padding: 1.25em;
     padding-block: 1.5em;
@@ -26,4 +30,14 @@ body, html {
 .center {
     margin: auto;
     text-align: center;
+}
+
+footer {
+    width: 100%;
+    text-align: center;
+    font-size: x-small;
+    color: #ccc;
+}
+footer a {
+    color: #ccc;
 }
