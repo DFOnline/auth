@@ -35,7 +35,7 @@ db.run(`CREATE TABLE IF NOT EXISTS users (
 function hash(key: string) {
     const hasher = new Bun.CryptoHasher("sha256");
     hasher.update(key);
-    return hasher.digest('base64');
+    return hasher.digest('hex');
 }
 
 export interface User {
