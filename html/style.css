@@ -1,0 +1,28 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    color-scheme: dark;
+    color: white;
+    background-color: #121212;
+    display: flex;
+    min-width: 100vw;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.pane {
+    background-color: #333;
+    border-radius: 1em;
+    padding: 1.25em;
+    padding-block: 1.5em;
+}
+.pane :first-child {
+    margin-top: 0;
+}
+.pane :last-child {
+    margin-bottom: 0;
+}
+
+.center {
+    margin: auto;
+}
