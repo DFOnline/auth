@@ -6,12 +6,37 @@ micros:
     src: .
     engine: custom
     commands:
+      - export BUN_INSTALL_CACHE_DIR=/tmp/bun/cache
       - apt-get update
       - apt-get -y install zip
-      - curl -L --fail --location --progress-bar --output out.zip https://github.com/oven-sh/bun/releases/download/bun-v1.0.0/bun-linux-x64.zip
+      - curl -L --fail --location --progress-bar --output out.zip https://github.com/oven-sh/bun/releases/download/bun-v1.0.3/bun-linux-x64.zip
       - unzip -d ./ -o out.zip
       - mv ./bun-linux-x64/bun ./
       - rm -r ./bun-linux-x64
       - chmod +x ./bun
+      - ./bun i
     run: ./bun index.ts
     primary: true
+    presets:
+      env:
+        - name: BUN_INSTALL_CACHE_DIR
+          description: DO NOT TOUCH
+          default: "/tmp/bun/cache"
+        - name: PLOT_ID
+          description: The id of the control plot.
+        - name: PLOT_OWNER
+          description: The owner of the control plot.
+        - name: AUTH_KEY
+          description: The auth key to be used by the control plot.
+        - name: DB_PATH
+          description: "What directory the database is in. :memory: works"
+          default: ":memory:"
+        - name: DETA
+          description: Should use deta drive to save?
+          default: "true"
+        - name: DETA_DRIVE
+          description: Name of the deta drive to use.
+          default: dfonline
+        - name: DETA_PATH
+          description: The name in the deta drive to say the database to.
+          default: database.db
