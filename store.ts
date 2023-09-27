@@ -1,20 +1,20 @@
 import { env } from "bun";
 import { Database } from 'bun:sqlite'
 
-
-const IS_DETA = env.DETA == 'true';
+const DETA = env.DETA == null ? null : (await import('deta')).Deta(env.DETA).Drive(env.DETA_DRIVE ?? 'dfonline');
 async function load() {
-    if(IS_DETA) {
-        const res = await (await import('deta')).Drive('dfonline-oauth').get(env.DETA_PATH ?? 'database.db');
-        return Database.deserialize( await res?.arrayBuffer() ?? new ArrayBuffer(0))
+    if(DETA) {
+        const res = await DETA.get(env.DETA_PATH ?? 'database.db');
+        return res == null ? new Database(env.DB_PATH, { create: true }) : Database.deserialize(new Uint8Array(await res.arrayBuffer()));
+        // oh and btw, if the deserialize call is returning a number, I fixed it by deleting node_modules, bun.lockb, and running bun i.
     }
     else {
         return new Database(env.DB_PATH, { create: true });
     }
 }
 async function save() {
-    if(IS_DETA) {
-        const res = await (await import('deta')).Drive('dfonline-oauth').put(env.DETA_PATH ?? 'database.db', { data: db.serialize() })
+    if(DETA) {
+        const res = await DETA.put(env.DETA_PATH ?? 'database.db', { data: db.serialize() });
     }
     else {
         // tmk it saves anyway
@@ -46,13 +46,15 @@ export interface User {
 
 /**
  * Securely saves a user. Will hash the key, so don't hash it before this.
+ * This will overwrite any user with the same uuid.
  * @param uuid Minecraft UUID
  * @param username Minecraft Name
  * @param key Non-Hashed pure access key.
  */
 export function setUser(uuid: string, username: string, key: string) {
-    deleteUser(uuid)
+    db.query(`DELETE FROM users WHERE uuid = ?1`).run(uuid);
     db.query(`INSERT INTO users (uuid, username, token) VALUES (?1, ?2, ?3);`).run(uuid,username,hash(key));
+    save();
 }
 /**
  * Delete a user.
@@ -60,6 +62,7 @@ export function setUser(uuid: string, username: string, key: string) {
  */
 export function deleteUser(user : string) {
     db.query(`DELETE FROM users WHERE uuid = ?1 OR username = ?1 OR token = ?1`).run(user);
+    save();
 }
 /**
  * Gets user data.
