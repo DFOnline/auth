@@ -23,20 +23,19 @@ micros:
           description: DO NOT TOUCH
           default: "/tmp/bun/cache"
         - name: PLOT_ID
-          description: The id of the control plot.
+          description: The id of the control plot
         - name: PLOT_OWNER
-          description: The owner of the control plot.
+          description: The owner of the control plot
         - name: AUTH_KEY
-          description: The auth key to be used by the control plot.
+          description: The auth key to be used by the control plot
         - name: DB_PATH
           description: "What directory the database is in. :memory: works"
           default: ":memory:"
         - name: DETA
-          description: Should use deta drive to save?
-          default: "true"
+          description: Deta auth key
         - name: DETA_DRIVE
-          description: Name of the deta drive to use.
+          description: Name of the deta drive to use
           default: dfonline
         - name: DETA_PATH
-          description: The name in the deta drive to say the database to.
+          description: The name in the deta drive to say the database to
           default: database.db
