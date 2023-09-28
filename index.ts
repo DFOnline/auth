@@ -64,7 +64,7 @@ new Elysia()
         req.cookie['username'].remove();
         return file(logout)
     })
-    .put('/user', (req) => {
+    .put('/user', req => {
         if(!isValidPlot(req)) {
             req.set.status = "Forbidden";
             // log the requesters ip 🤨📸
@@ -76,7 +76,7 @@ new Elysia()
         req.set.status = "No Content";
         return; // Only DF is supposed to be here, and it doesn't use response bodies.
     })
-    .delete('/user', (req) => {
+    .delete('/user', req => {
         if(isValidPlot(req)) {
             deleteUser(req.body as string);
             req.set.status = "No Content";
@@ -90,7 +90,7 @@ new Elysia()
         deleteUser(auth.uuid);
         return {"status":"deleted",...auth};
     })
-    .get('/user', (req) => {
+    .get('/user', req => {
         req.set.headers['Access-Control-Allow-Origin'] = '*';
         // the plot will never get info, so it doesn't have access.
         const auth = authReqUser(req);
@@ -100,6 +100,6 @@ new Elysia()
         }
         return auth;
     })
-    .listen(process.env.PORT ?? 3000, () => {
-        console.log('Listening.');
+    .listen(process.env.PORT ?? 3000, server => {
+        console.log(`[${Date.now() / 1000}] Server is listening. Hostname ${server.hostname}; port ${server.port}.`);
     });

@@ -41,3 +41,9 @@ footer {
 footer a {
     color: #ccc;
 }
+
+code {
+    background-color: #121212;
+    padding: 2px;
+    border-radius: 3px;
+}
