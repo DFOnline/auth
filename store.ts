@@ -52,6 +52,8 @@ export interface User {
  * @param key Non-Hashed pure access key.
  */
 export function setUser(uuid: string, username: string, key: string) {
+    if(!uuid.match(/^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$/)) throw new TypeError("Couldn't validate UUID");
+    if(!username.match(/^\w{3,16}$/)) throw new TypeError("Couldn't validate username");
     db.query(`DELETE FROM users WHERE uuid = ?1`).run(uuid);
     db.query(`INSERT INTO users (uuid, username, token) VALUES (?1, ?2, ?3);`).run(uuid,username,hash(key));
     save();

@@ -1,8 +1,16 @@
 import { env, file } from "bun";
 import Elysia, { Cookie } from "elysia";
 import { User, authUser, deleteUser, setUser } from "./store";
+import { filterXSS } from "xss";
 
-const {PLOT_ID, PLOT_OWNER, AUTH_KEY} = env as Record<string,string>;
+//@ts-ignore
+import index from './html/index.html'
+//@ts-ignore
+import logged from './html/logged.html'
+//@ts-ignore
+import login from './html/login.html'
+
+const {PLOT_ID, PLOT_OWNER, AUTH_KEY} = env;
 
 
 type Store = Record<string, string | null>;
@@ -18,21 +26,36 @@ function isValidPlot(req: {headers: Store, query: Store}) {
 }
 
 function authReqUser(req: {body: any, cookie: Record<string, Cookie<any>>, headers: Store, query: Store}): User | null {
-    const key = req.query['auth'] ?? req.query['key'] ?? req.cookie['key'].value ?? req.headers['Authorization'] ?? req.body;
+    const key = req.query['auth'] || req.cookie['key'].value || req.query['key'] || req.headers['Authorization'] || req.body;
     return authUser(key);
 }
 
 new Elysia()
-    .get('/', () => file('./html/index.html'))
+    .get('/', async req => {
+        const auth = authReqUser(req);
+        if(auth != null) {
+            const f = file(logged);
+            req.set.headers['content-type'] = f.type;
+            return (await f.text()).replaceAll('$USERNAME$',filterXSS(auth.username)).replaceAll('$HEAD$',`https://crafatar.com/avatars/${auth.uuid.replaceAll('"','\\"')}?overlay`);
+        }
+        const f = file(index);
+        req.set.headers['content-type'] = f.type;
+        return (await f.text()).replaceAll('$ID$',filterXSS(PLOT_ID ?? "NONE SET"));
+    })
     .get('/style.css', () => file('./html/style.css'))
-    .get('/login', req => {
+    .get('/login', async req => {
         const auth = authUser(req.query['key'] as string);
         if(auth != null) {
             req.cookie['key'].value = req.query['key'];
             req.cookie['uuid'].value = auth.uuid;
-            req.cookie['username'].value = auth.username
+            req.cookie['username'].value = auth.username;
+
+            const f = file(index);
+            req.set.headers['content-type'] = f.type;
+            console.log(PLOT_ID)
+            return (await f.text()).replaceAll('$USERNAME$',auth.username).replaceAll('$HEAD$',`https://crafatar.com/avatars/${auth.uuid.replaceAll('"','\\"')}?overlay`);
         }
-        return file('./html/login.html');
+        return file(login);
     })
     .put('/user', (req) => {
         if(!isValidPlot(req)) {
