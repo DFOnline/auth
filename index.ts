@@ -1,19 +1,21 @@
 import { env, file } from "bun";
 import Elysia, { Cookie } from "elysia";
-import { User, authUser, deleteUser, setUser } from "./store";
+import { User, authUser, deleteUser, getUser, setUser } from "./store";
 import { filterXSS } from "xss";
 
 //@ts-ignore
-import index from './html/index.html';
+import LOGGED_IN from './html/logged-out.html';
 //@ts-ignore
-import logged from './html/logged.html';
+import LOGGED_OUT from './html/logged-in.html';
 //@ts-ignore
-import login from './html/login.html';
+import LOGIN from './html/login.html';
 //@ts-ignore
-import logout from './html/logout.html';
+import LOGOUT from './html/logout.html';
+import { randomUUID } from "crypto";
 
 const {PLOT_ID, PLOT_OWNER, AUTH_KEY} = env;
 
+const AuthTokens = new Map<string,string>();
 
 type Store = Record<string, string | null>;
 function isValidPlot(req: {headers: Store, query: Store}) {
@@ -36,11 +38,11 @@ new Elysia()
     .get('/', async req => {
         const auth = authReqUser(req);
         if(auth != null) {
-            const f = file(logged);
+            const f = file(LOGGED_OUT);
             req.set.headers['content-type'] = f.type;
             return (await f.text()).replaceAll('$USERNAME$',filterXSS(auth.username)).replaceAll('$HEAD$',`https://crafatar.com/avatars/${auth.uuid.replaceAll('"','\\"')}?overlay`);
         }
-        const f = file(index);
+        const f = file(LOGGED_IN);
         req.set.headers['content-type'] = f.type;
         return (await f.text()).replaceAll('$ID$',filterXSS(PLOT_ID ?? "NONE SET"));
     })
@@ -52,17 +54,54 @@ new Elysia()
             req.cookie['uuid'].value = auth.uuid;
             req.cookie['username'].value = auth.username;
 
-            const f = file(logged);
+            const f = file(LOGGED_OUT);
             req.set.headers['content-type'] = f.type;
             return (await f.text()).replaceAll('$USERNAME$',auth.username).replaceAll('$HEAD$',`https://crafatar.com/avatars/${auth.uuid.replaceAll('"','\\"')}?overlay`);
         }
-        return file(login);
+        return file(LOGIN);
     })
     .get('/logout', req => {
         req.cookie['key'].remove();
         req.cookie['uuid'].remove();
         req.cookie['username'].remove();
-        return file(logout)
+        return file(LOGOUT)
+    })
+    .get('/auth', req => {
+        const auth = authReqUser(req);
+        if(!auth) {
+            req.set.status = 'Unauthorized';
+            return file(LOGGED_OUT);
+        }
+        const redirect = req.query['redirect'];
+        try {
+            const url = new URL(redirect ?? '');
+            const token = randomUUID();
+            AuthTokens.set(token,auth.uuid);
+            url.searchParams.set('code',token);
+            req.set.redirect = url.toString();
+            return;
+        }
+        catch {
+            req.set.status == 'Bad Request';
+            return 'Redirect is not url.';
+        }
+    })
+    .post('/auth', req => {
+        const code = req.query['code'] || req.body;
+        if(!code) {
+            req.set.status = 'Bad Request';
+            return "Couldn't find code. Put it as ?code=<code> or have the body the code, pure text.";
+        }
+        if(typeof code != 'string') {
+            req.set.status = 'Bad Request';
+            return `Code was a ${typeof code}, you are probably using a JSON body, have the body be pure text containing only the token, or use a search param like ?code=<code>`;
+        }
+        if(!AuthTokens.has(code)) {
+            req.set.status = 'Not Found';
+            return "Couldn't find something any requests with this code.";
+        }
+        const auth = getUser(AuthTokens.get(code) as string);
+        return {username: auth?.username, uuid: auth?.uuid};
     })
     .put('/user', req => {
         if(!isValidPlot(req)) {
