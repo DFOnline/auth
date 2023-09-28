@@ -11,42 +11,8 @@
         <img id="head" src="$HEAD$" alt="Player Head">
         <p>Hello $USERNAME$</p>
         <hr>
-        <button onclick="logout()">Logout</button>
+        <a href="./logout">Logout</a>
     </div>
-    <script>
-        const loggedOut = document.getElementById('logged-out');
-        const loggedIn = document.getElementById('logged-in');
-
-        const key = localStorage.getItem('user')
-        if(key != null) {
-            const auth = JSON.parse(key);
-
-            loggedOut.style.display = 'none'
-            loggedIn.style.display = '';
-
-            const username = document.getElementById('username');
-            username.innerText = auth.username;
-            /**
-             * @type {HTMLImageElement}
-             */
-            const head = document.getElementById('head');
-            head.src = `https://crafatar.com/avatars/${auth.uuid}?overlay`;
-        }
-
-        function logout() {
-            localStorage.clear();
-
-            const cookies = document.cookie.split(";");
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i];
-                const eqPos = cookie.indexOf("=");
-                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-            }
-
-            location.reload();
-        }
-    </script>
     <footer>
         DFOnline <a href="https://github.com/DFOnline/auth">Auth</a> by <a href="https://github.com/GeorgeRNG">GeorgeRNG</a>
         <br>

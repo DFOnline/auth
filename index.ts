@@ -4,11 +4,13 @@ import { User, authUser, deleteUser, setUser } from "./store";
 import { filterXSS } from "xss";
 
 //@ts-ignore
-import index from './html/index.html'
+import index from './html/index.html';
 //@ts-ignore
-import logged from './html/logged.html'
+import logged from './html/logged.html';
 //@ts-ignore
-import login from './html/login.html'
+import login from './html/login.html';
+//@ts-ignore
+import logout from './html/logout.html';
 
 const {PLOT_ID, PLOT_OWNER, AUTH_KEY} = env;
 
@@ -50,12 +52,17 @@ new Elysia()
             req.cookie['uuid'].value = auth.uuid;
             req.cookie['username'].value = auth.username;
 
-            const f = file(index);
+            const f = file(logged);
             req.set.headers['content-type'] = f.type;
-            console.log(PLOT_ID)
             return (await f.text()).replaceAll('$USERNAME$',auth.username).replaceAll('$HEAD$',`https://crafatar.com/avatars/${auth.uuid.replaceAll('"','\\"')}?overlay`);
         }
         return file(login);
+    })
+    .get('/logout', req => {
+        req.cookie['key'].remove();
+        req.cookie['uuid'].remove();
+        req.cookie['username'].remove();
+        return file(logout)
     })
     .put('/user', (req) => {
         if(!isValidPlot(req)) {
