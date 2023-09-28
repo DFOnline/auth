@@ -4,9 +4,9 @@ import { User, authUser, deleteUser, getUser, setUser } from "./store";
 import { filterXSS } from "xss";
 
 //@ts-ignore
-import LOGGED_IN from './html/logged-out.html';
+import LOGGED_OUT from './html/logged-out.html';
 //@ts-ignore
-import LOGGED_OUT from './html/logged-in.html';
+import LOGGED_IN from './html/logged-in.html';
 //@ts-ignore
 import LOGIN from './html/login.html';
 //@ts-ignore
@@ -38,11 +38,11 @@ new Elysia()
     .get('/', async req => {
         const auth = authReqUser(req);
         if(auth != null) {
-            const f = file(LOGGED_OUT);
+            const f = file(LOGGED_IN);
             req.set.headers['content-type'] = f.type;
             return (await f.text()).replaceAll('$USERNAME$',filterXSS(auth.username)).replaceAll('$HEAD$',`https://crafatar.com/avatars/${auth.uuid.replaceAll('"','\\"')}?overlay`);
         }
-        const f = file(LOGGED_IN);
+        const f = file(LOGGED_OUT);
         req.set.headers['content-type'] = f.type;
         return (await f.text()).replaceAll('$ID$',filterXSS(PLOT_ID ?? "NONE SET"));
     })
@@ -54,7 +54,7 @@ new Elysia()
             req.cookie['uuid'].value = auth.uuid;
             req.cookie['username'].value = auth.username;
 
-            const f = file(LOGGED_OUT);
+            const f = file(LOGGED_IN);
             req.set.headers['content-type'] = f.type;
             return (await f.text()).replaceAll('$USERNAME$',auth.username).replaceAll('$HEAD$',`https://crafatar.com/avatars/${auth.uuid.replaceAll('"','\\"')}?overlay`);
         }
